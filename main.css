@@ -77,7 +77,24 @@ textarea {
 .form-group {
     margin-top: 10px;
 }
-
 .row {
     margin: 0 auto;
 }
+
+/*// Extra small devices (portrait phones, less than 576px)*/
+/*// No media query since this is the default in Bootstrap*/
+
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+    .container {
+        width: 80%;
+    }
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    .container {
+        width: 80%;
+    }
+}
+
