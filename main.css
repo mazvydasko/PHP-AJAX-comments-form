@@ -1,0 +1,83 @@
+form button {
+    margin: 5px 0px;
+}
+textarea {
+    display: block;
+    margin-bottom: 10px;
+}
+.post {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+.comments-section {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+.comment {
+    margin-bottom: 10px;
+}
+.comment .comment-name {
+    font-weight: bold;
+}
+.comment .comment-date {
+    font-style: italic;
+    font-size: 0.8em;
+}
+.comment .reply-btn, .edit-btn {
+    font-size: 0.8em;
+}
+.comment-details {
+    width: 95%;
+    float: left;
+    margin-bottom: 5px;
+    background-color: gainsboro;
+    border-radius: 5px;
+    padding: 10px;
+}
+.comment-details p {
+    margin-bottom: 0px;
+}
+.comment .profile_pic {
+    width: 35px;
+    height: 35px;
+    margin-right: 5px;
+    float: left;
+    border-radius: 50%;
+}
+.reply {
+    margin-left: 30px;
+}
+.reply_form {
+    margin-left: 40px;
+    margin-bottom: 10px;
+    display: none;
+}
+#comment_form {
+    margin-top: 10px;
+}
+.col {
+    display: inline-block;
+}
+#error-div {
+    border: 1px solid red;
+    display: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+#reply-error-div {
+    border: 1px solid red;
+    display: none;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+.form-group {
+    margin-top: 10px;
+}
+
+.row {
+    margin: 0 auto;
+}
