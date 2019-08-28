@@ -1,3 +1,7 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
 form button {
     margin: 5px 0px;
 }
@@ -57,6 +61,7 @@ textarea {
 }
 .col {
     display: inline-block;
+    margin-bottom: 5px;
 }
 #error-div {
     border: 1px solid red;
@@ -75,6 +80,9 @@ textarea {
     padding-left: 10px;
 }
 .form-group {
+    margin-top: 10px;
+}
+#reply_text {
     margin-top: 10px;
 }
 .row {

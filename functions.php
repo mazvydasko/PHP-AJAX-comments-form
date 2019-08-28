@@ -1,21 +1,26 @@
 <?php
 
+// connect to database
 $db = mysqli_connect("localhost", "root", "", "comments-reply");
 
+// Get all comments from database
 $comments_query_result = mysqli_query($db, "SELECT * FROM comments ORDER BY created_at DESC");
 $comments = mysqli_fetch_all($comments_query_result, MYSQLI_ASSOC);
 
-function getRepliesByCommentId($id) {
+// Receives a comment id and returns the username
+function getRepliesByCommentId($id)
+{
     global $db;
-    $result = mysqli_query($db, "SELECT * FROM replies WHERE comment_id=$id ORDER BY created_at DESC");
+    $result = mysqli_query($db, "SELECT * FROM replies WHERE comment_id=$id");
     $replies = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return $replies;
 }
 
-function getCommentsCount() {
+function getCommentsCount()
+{
     global $db;
-    $resultComments = mysqli_query($db,"SELECT id FROM comments");
-    $resultReplies = mysqli_query($db,"SELECT id FROM replies");
+    $resultComments = mysqli_query($db, "SELECT id FROM comments");
+    $resultReplies = mysqli_query($db, "SELECT id FROM replies");
     $numComments = $resultComments->num_rows;
     $numReplies = $resultReplies->num_rows;
     $result = $numComments + $numReplies;
@@ -28,59 +33,56 @@ if (isset($_POST['comment_posted'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
 
-    if (empty($comment_text) || empty($name) || empty($email)) {
-        return false;
-    } elseif (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
-        return false;
-    } else {
-        $sql = "INSERT INTO comments (body, name, email) VALUES ('$comment_text','$name','$email')";
-        $result = mysqli_query($db, $sql);
-        $inserted_id = $db->insert_id;
-        $res = mysqli_query($db, "SELECT * FROM comments WHERE id=$inserted_id");
-        $inserted_comment = mysqli_fetch_assoc($res);
-        if ($result) {
-            $comment = "<div class='comment clearfix'>
-					<div class='comment-details'>
-					
-						<span class='comment-name'>" . $inserted_comment['name'] . "</span>
-						<span class='comment-date'>" . $inserted_comment['created_at'] . "</span>
-                        <a class='reply-btn pull-right btn btn-primary' href='#' data-id='" . $inserted_comment['id'] . "'>Reply</a>
+    $sql = "INSERT INTO comments (body, name, email) VALUES ('$comment_text', '$name', '$email')";
+    $result = mysqli_query($db, $sql);
 
+    // Query same comment from database to send back to be displayed
+    $inserted_id = $db->insert_id;
+    $res = mysqli_query($db, "SELECT * FROM comments WHERE id=$inserted_id");
+    $inserted_comment = mysqli_fetch_assoc($res);
 
-						<p>" . $inserted_comment['body'] . "</p>
-					</div>
-					<!-- reply form -->
-					<form action='index.php' class='reply_form clearfix' id='comment_reply_form_" . $inserted_comment['id'] . "' data-id='" . $inserted_comment['id'] . "'>
-					    <div class=\"form-row mb-4\">
-					    <div id=\"reply-error-div\"></div>
-                                    <div class=\"col\">
-                                        <label for=\"email\">Email*</label>
-                                        <input type=\"email\" id=\"reply_email\" class=\"form-control\" name=\"reply_email\" placeholder=\"Enter email\">
+    // if insert was successful, get that same comment from the database and return it
+    if ($result) {
+        $comment = "<div class='comment clearfix'>
+					    <div class='comment-details'>
+						    <span class='comment-name'>" . $inserted_comment['name'] . "</span>
+						    <span class='comment-date'>" . $inserted_comment['created_at'] . "</span>
+                            <a class='reply-btn btn btn-primary pull-right' href='#' data-id='" . $inserted_comment['id'] . "'>Reply</a>
+						    <p>" . $inserted_comment['body'] . "</p>
+					    </div>
+                        <!-- reply form -->
+                        <form action='functions.php' class='reply_form clearfix dom' id='comment_reply_form_" . $inserted_comment['id'] . "' data-id='" . $inserted_comment['id'] . "'>
+                        <div class=\"form-row mb-4\">
+                            <div id=\"reply-error-div\"></div>
+                                <div class=\"col\">
+                                    <label for=\"email\">Email*</label>
+                                    <input type=\"email\" id=\"reply_email\" class=\"form-control\" name=\"reply_email\"
+                                               placeholder=\"Enter email\">
                                     </div>
                                     <div class=\"col\">
                                         <label for=\"name\">Name*</label>
-                                        <input type=\"text\" id=\"reply_name\" class=\"form-control\" name=\"reply_name\" placeholder=\"Enter name\">
+                                        <input type=\"text\" id=\"reply_name\" class=\"form-control\" name=\"reply_name\"
+                                               placeholder=\"Enter name\">
                                     </div>
                                 </div>
-                                <div class=\"form-group\">
-                                    <label for=\"comment\">Comment*</label>
-                                    <textarea class=\"form-control\" id=\"reply_text\" name=\"reply_comment\"></textarea>
-                                </div>
-						<button class='btn btn-primary pull-right submit-reply'>Submit reply</button>
-					</form>
-				</div>";
-            $comment_info = array(
-                'comment' => $comment,
-            );
-            echo json_encode($comment_info);
-            exit();
-        } else {
-            echo "error";
-            exit();
-        }
+                                <label for=\"comment\">Comment*</label>
+                            <textarea class='form-control' name='reply_text' id='reply_text' cols='30' rows='2'></textarea>
+                            <button class='btn btn-primary btn-xs pull-right submit-reply'>Submit reply</button>
+                        </form>
+                        <div class='replies_wrapper_" . $inserted_comment['id'] . "'></div>
+				        </div>";
+        $comment_info = array(
+            'comment' => $comment,
+        );
+        echo json_encode($comment_info);
+        exit();
+    } else {
+        echo "error";
+        exit();
     }
 }
 
+// If the user clicked submit on reply form...
 if (isset($_POST['reply_posted'])) {
     global $db;
     $reply_text = $_POST['reply_text'];
@@ -88,29 +90,26 @@ if (isset($_POST['reply_posted'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
 
-    if (empty($reply_text) || empty($name) || empty($email)) {
-        return false;
-    } elseif (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
-        return false;
-    } else {
-        $sql = "INSERT INTO replies (comment_id, body, name, email) VALUES ('$comment_id', '$reply_text', '$name', '$email')";
-        $result = mysqli_query($db, $sql);
-        $inserted_id = $db->insert_id;
-        $res = mysqli_query($db, "SELECT * FROM replies WHERE id=$inserted_id ORDER BY created_at DESC");
-        $inserted_reply = mysqli_fetch_assoc($res);
-        if ($result) {
-            $reply = "<div class='comment reply clearfix'>
+    $sql = "INSERT INTO replies (comment_id, body, name, email) VALUES ('$comment_id', '$reply_text', '$name', '$email')";
+    $result = mysqli_query($db, $sql);
+
+    $inserted_id = $db->insert_id;
+    $res = mysqli_query($db, "SELECT * FROM replies WHERE id=$inserted_id");
+    $inserted_reply = mysqli_fetch_assoc($res);
+
+    // if insert was successful, get that same reply from the database and return it
+    if ($result) {
+        $reply = "<div class='comment reply clearfix'>
 					<div class='comment-details'>
-					<span class='comment-name'>" . $inserted_reply['name'] . "</span> 
+						<span class='comment-name'>" . $inserted_reply['name'] . "</span>
 						<span class='comment-date'>" . $inserted_reply['created_at'] . "</span>
 						<p>" . $inserted_reply['body'] . "</p>
 					</div>
 				</div>";
-            echo $reply;
-            exit();
-        } else {
-            echo "error";
-            exit();
-        }
+        echo $reply;
+        exit();
+    } else {
+        echo "error";
+        exit();
     }
 }
